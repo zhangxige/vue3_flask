@@ -37,3 +37,7 @@ npm run build
 ```sh
 npm run lint
 ```
+
+### Supplementary explanation
+
+The backend interface(API) can be implemented using either Flask or FastAPI
