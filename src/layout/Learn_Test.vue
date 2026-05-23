@@ -128,10 +128,11 @@
         <button class="secondary" @click="fetchTasks">查询任务</button>
         <ul v-if="tasks.length" class="task-list">
           <li v-for="task in tasks" :key="task.id">
-            <strong>#{{ task.id }}</strong>
-            <span>{{ task.duration }} 分钟</span>
-            <span>{{ task.param1 }}</span>
-            <span>参数2: {{ task.param2 }}</span>
+            <strong>#{{ task.name }}</strong>
+            <span>{{ task.params.duration }} 秒</span>
+            <span>状态：{{ task.status }}</span>
+            <span>创建时间: {{ task.created_at }}</span>
+            <span v-if="task.completed_at">完成时间: {{ task.completed_at }}</span>
           </li>
         </ul>
         <p v-else class="empty-state">暂无任务数据，点击按钮加载</p>
@@ -145,10 +146,16 @@ import { ref, reactive, computed } from 'vue'
 import axios from 'axios'
 
 interface Task {
-  id: number
+  id: string
+  name: string
   duration: number
-  param1: string
-  param2: number
+  status: string
+  params: {
+    duration: string
+    param2: number
+  }
+  created_at: string | null
+  completed_at: string | null
 }
 
 const count = ref(0)
@@ -211,8 +218,8 @@ const submitData = async () => {
   try {
     const response = await axios.post('http://localhost:8000/posttask', {
       name: name.value,
-      duration: parseInt(time.value),
-      param1: content.value,
+      duration: parseInt(time.value, 10),
+      param1: 'content.value',
       param2: 3,
     })
     console.log('提交成功:', response.data)
@@ -224,8 +231,8 @@ const submitData = async () => {
 const tasks = ref<Task[]>([])
 const fetchTasks = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/tasks')
-    tasks.value = response.data.running_tasks
+    const response = await axios.get('http://localhost:8000/posttask')
+    tasks.value = response.data.tasks
     console.log('获取任务成功:', tasks.value)
   } catch (error) {
     console.error('获取任务失败:', error)
